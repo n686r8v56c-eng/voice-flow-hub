@@ -21,6 +21,46 @@ function readSaved() {
     return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
   } catch { return {}; }
 }
+
+const VOICE_LEVELS = [{"id":1,"title":"기초","items":[{"id":1,"en":"Body Scan","ko":"신체 긴장 관찰","youtube":""},{"id":2,"en":"Neutral Alignment","ko":"자세 정렬","youtube":""},{"id":3,"en":"Jaw Release","ko":"턱 이완","youtube":""},{"id":4,"en":"Natural Breath","ko":"자연호흡","youtube":""},{"id":5,"en":"Rib Expansion","ko":"늑골 움직임","youtube":""},{"id":6,"en":"S-Hiss","ko":"일정한 호기","youtube":""},{"id":7,"en":"Easy Onset","ko":"부드러운 발성 시작","youtube":""},{"id":8,"en":"Straw Phonation","ko":"빨대 발성","youtube":""},{"id":9,"en":"Gentle Humming","ko":"허밍","youtube":""},{"id":10,"en":"Comfortable Tone","ko":"편안한 지속 발성","youtube":""}]},{"id":2,"title":"제어","items":[{"id":11,"en":"Lip Trill","ko":"입술 트릴","youtube":""},{"id":12,"en":"Cup Bubble Phonation","ko":"물컵 발성","youtube":""},{"id":13,"en":"Pitch Glide","ko":"음높이 이동","youtube":""},{"id":14,"en":"Three-Pitch Pattern","ko":"3단 음높이","youtube":""},{"id":15,"en":"Soft-Medium Voice","ko":"음량 전환","youtube":""},{"id":16,"en":"M-N-NG Transition","ko":"비음 전환","youtube":""},{"id":17,"en":"Humming to Vowel","ko":"허밍·모음 연결","youtube":""},{"id":18,"en":"Resonant Syllables","ko":"공명 음절","youtube":""},{"id":19,"en":"Resonant Sentences","ko":"공명 문장","youtube":""},{"id":20,"en":"Voice-to-Speech","ko":"발성에서 말하기 연결","youtube":""}]},{"id":3,"title":"발음","items":[{"id":21,"en":"Vowel Precision","ko":"모음 정확도","youtube":""},{"id":22,"en":"Consonant Contrast","ko":"자음 구별","youtube":""},{"id":23,"en":"Final Consonants","ko":"받침 발음","youtube":""},{"id":24,"en":"Tongue Placement","ko":"혀의 위치","youtube":""},{"id":25,"en":"Tongue Twisters","ko":"잰말놀이","youtube":""},{"id":26,"en":"Rising-Falling Intonation","ko":"상승·하강 억양","youtube":""},{"id":27,"en":"Contrastive Stress","ko":"강세 전환","youtube":""},{"id":28,"en":"Rhythm Reading","ko":"리듬 낭독","youtube":""},{"id":29,"en":"Tempo Variation","ko":"속도 조절","youtube":""},{"id":30,"en":"Semantic Pausing","ko":"의미 단위 쉼","youtube":""}]},{"id":4,"title":"표현","items":[{"id":31,"en":"Volume Scale","ko":"음량 조절","youtube":""},{"id":32,"en":"Projection Without Shouting","ko":"소리 지르지 않는 투사","youtube":""},{"id":33,"en":"Clear Speech","ko":"명료한 말하기","youtube":""},{"id":34,"en":"Key Message Delivery","ko":"핵심 메시지 전달","youtube":""},{"id":35,"en":"Emotion Contrast","ko":"감정 변화","youtube":""},{"id":36,"en":"Emotional Restraint","ko":"절제된 감정","youtube":""},{"id":37,"en":"Action Verb Reading","ko":"행동 의도 표현","youtube":""},{"id":38,"en":"Intention Shift","ko":"의도 전환","youtube":""},{"id":39,"en":"Hidden Meaning","ko":"서브텍스트","youtube":""},{"id":40,"en":"Character Vocal Profile","ko":"캐릭터 음성","youtube":""}]},{"id":5,"title":"실전","items":[{"id":41,"en":"First-Sight Reading","ko":"초견 낭독","youtube":""},{"id":42,"en":"News Anchor Reading","ko":"뉴스 리딩","youtube":""},{"id":43,"en":"Numbers & Names","ko":"숫자·고유명사","youtube":""},{"id":44,"en":"Studio Reading","ko":"마이크 리딩","youtube":""},{"id":45,"en":"Narration Reading","ko":"내레이션","youtube":""},{"id":46,"en":"Dialogue Exchange","ko":"대사 교환","youtube":""},{"id":47,"en":"Monologue Delivery","ko":"독백","youtube":""},{"id":48,"en":"Scene Objective","ko":"장면 목표","youtube":""},{"id":49,"en":"One-Minute Speech","ko":"1분 스피치","youtube":""},{"id":50,"en":"Voice Recording Review","ko":"녹음 비교 평가","youtube":""}]}];
+function youtubeId(url) {
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'youtu.be') return /^[\w-]{11}$/.test(u.pathname.slice(1)) ? u.pathname.slice(1) : '';
+    if (['youtube.com','www.youtube.com','m.youtube.com','www.youtube-nocookie.com'].includes(u.hostname)) {
+      const id = u.pathname.startsWith('/shorts/') || u.pathname.startsWith('/embed/') ? u.pathname.split('/')[2] : u.searchParams.get('v');
+      return /^[\w-]{11}$/.test(id || '') ? id : '';
+    }
+  } catch {}
+  return '';
+}
+function VoiceTraining() {
+  const [level,setLevel] = useState(0);
+  const [opened,setOpened] = useState(null);
+  const selectLevel = i => {setLevel(i);setOpened(null)};
+  return <section className="voice-training" aria-label="발성 훈련 50 Drill">
+    <div className="voice-heading"><div><strong>Voice Training</strong><span>5단계 × 10 Drill</span></div><small>LEVEL {level+1} / 5</small></div>
+    <nav className="voice-levels" aria-label="발성 훈련 단계">{VOICE_LEVELS.map((l,i)=><button type="button" className={level===i?'selected':''} aria-current={level===i?'step':undefined} onClick={()=>selectLevel(i)} key={l.id}><small>Lv.{l.id}</small><b>{l.title}</b></button>)}</nav>
+    <div className="voice-list-title"><b>LEVEL {level+1} · {VOICE_LEVELS[level].title}</b><span>10 Drill</span></div>
+    <div className="voice-list">{VOICE_LEVELS[level].items.map((item,i)=>{
+      const isOpen=opened===item.id;
+      const video=youtubeId(item.youtube);
+      return <div className="voice-drill" key={item.id}>
+        <button type="button" className="voice-drill-heading" aria-expanded={isOpen} onClick={()=>setOpened(isOpen?null:item.id)}>
+          <span className="voice-drill-number">{String(item.id).padStart(2,'0')}</span>
+          <span className="voice-drill-names"><b>{item.en}</b><small>{item.ko}</small></span>
+          <ChevronDown size={16} className={isOpen?'rotated':''}/>
+        </button>
+        {isOpen && <div className="voice-video-content">{video ?
+          <div className="voice-video-wrap"><iframe title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>:
+          <div className="voice-video-wait"><span>영상 링크 등록 대기</span><small>유튜브 링크가 연결되면 이곳에서 바로 재생할 수 있어.</small></div>}
+        </div>}
+      </div>
+    })}</div>
+  </section>;
+}
+
 function App() {
   const initial = new URLSearchParams(window.location.search).get('app');
   const [selected,setSelected] = useState(MODES.some(m=>m.id===initial)?initial:MODES[0].id);
@@ -81,7 +121,7 @@ function App() {
       </div>
     </div>
     <main className="frame-area">
-      {activeUrl ? <iframe key={selected+'-'+frameVersion+'-'+activeUrl} title={current.label+' 앱'} src={activeUrl} allow="microphone; camera; clipboard-write" referrerPolicy="strict-origin-when-cross-origin"/>:
+      {selected === 'voice' ? <VoiceTraining/> : activeUrl ? <iframe key={selected+'-'+frameVersion+'-'+activeUrl} title={current.label+' 앱'} src={activeUrl} allow="microphone; camera; clipboard-write" referrerPolicy="strict-origin-when-cross-origin"/>:
         <div className="empty">
           <div className="empty-icon"><Link2 size={25}/></div>
           <h2>{current.label} 연결 준비</h2>
