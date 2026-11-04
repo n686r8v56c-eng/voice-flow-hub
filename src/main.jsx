@@ -22,7 +22,7 @@ function readSaved() {
   } catch { return {}; }
 }
 
-const VOICE_LEVELS = [{"id":1,"title":"기초","items":[{"id":1,"en":"Body Scan","ko":"신체 긴장 관찰","youtube":""},{"id":2,"en":"Neutral Alignment","ko":"자세 정렬","youtube":""},{"id":3,"en":"Jaw Release","ko":"턱 이완","youtube":""},{"id":4,"en":"Natural Breath","ko":"자연호흡","youtube":"https://youtu.be/ndXdxpItYww?si=zZm_tkHGtEfZe9dy"},{"id":5,"en":"Thoracic Mobility","ko":"흉추 가동성","youtube":"https://youtu.be/9iHko2F81cE?si=SAP_8-7p_vHJwIYY"},{"id":6,"en":"S-Hiss","ko":"일정한 호기","youtube":""},{"id":7,"en":"Easy Onset","ko":"부드러운 발성 시작","youtube":""},{"id":8,"en":"Straw Phonation","ko":"빨대 발성","youtube":""},{"id":9,"en":"Gentle Humming","ko":"허밍","youtube":""},{"id":10,"en":"Comfortable Tone","ko":"편안한 지속 발성","youtube":""}]},{"id":2,"title":"제어","items":[{"id":11,"en":"Lip Trill","ko":"입술 트릴","youtube":""},{"id":12,"en":"Cup Bubble Phonation","ko":"물컵 발성","youtube":""},{"id":13,"en":"Pitch Glide","ko":"음높이 이동","youtube":""},{"id":14,"en":"Three-Pitch Pattern","ko":"3단 음높이","youtube":""},{"id":15,"en":"Soft-Medium Voice","ko":"음량 전환","youtube":""},{"id":16,"en":"M-N-NG Transition","ko":"비음 전환","youtube":""},{"id":17,"en":"Humming to Vowel","ko":"허밍·모음 연결","youtube":""},{"id":18,"en":"Resonant Syllables","ko":"공명 음절","youtube":""},{"id":19,"en":"Resonant Sentences","ko":"공명 문장","youtube":""},{"id":20,"en":"Voice-to-Speech","ko":"발성에서 말하기 연결","youtube":""}]},{"id":3,"title":"발음","items":[{"id":21,"en":"Vowel Precision","ko":"모음 정확도","youtube":""},{"id":22,"en":"Consonant Contrast","ko":"자음 구별","youtube":""},{"id":23,"en":"Final Consonants","ko":"받침 발음","youtube":""},{"id":24,"en":"Tongue Placement","ko":"혀의 위치","youtube":""},{"id":25,"en":"Tongue Twisters","ko":"잰말놀이","youtube":""},{"id":26,"en":"Rising-Falling Intonation","ko":"상승·하강 억양","youtube":""},{"id":27,"en":"Contrastive Stress","ko":"강세 전환","youtube":""},{"id":28,"en":"Rhythm Reading","ko":"리듬 낭독","youtube":""},{"id":29,"en":"Tempo Variation","ko":"속도 조절","youtube":""},{"id":30,"en":"Semantic Pausing","ko":"의미 단위 쉼","youtube":""}]},{"id":4,"title":"표현","items":[{"id":31,"en":"Volume Scale","ko":"음량 조절","youtube":""},{"id":32,"en":"Projection Without Shouting","ko":"소리 지르지 않는 투사","youtube":""},{"id":33,"en":"Clear Speech","ko":"명료한 말하기","youtube":""},{"id":34,"en":"Key Message Delivery","ko":"핵심 메시지 전달","youtube":""},{"id":35,"en":"Emotion Contrast","ko":"감정 변화","youtube":""},{"id":36,"en":"Emotional Restraint","ko":"절제된 감정","youtube":""},{"id":37,"en":"Action Verb Reading","ko":"행동 의도 표현","youtube":""},{"id":38,"en":"Intention Shift","ko":"의도 전환","youtube":""},{"id":39,"en":"Hidden Meaning","ko":"서브텍스트","youtube":""},{"id":40,"en":"Character Vocal Profile","ko":"캐릭터 음성","youtube":""}]},{"id":5,"title":"실전","items":[{"id":41,"en":"First-Sight Reading","ko":"초견 낭독","youtube":""},{"id":42,"en":"News Anchor Reading","ko":"뉴스 리딩","youtube":""},{"id":43,"en":"Numbers & Names","ko":"숫자·고유명사","youtube":""},{"id":44,"en":"Studio Reading","ko":"마이크 리딩","youtube":""},{"id":45,"en":"Narration Reading","ko":"내레이션","youtube":""},{"id":46,"en":"Dialogue Exchange","ko":"대사 교환","youtube":""},{"id":47,"en":"Monologue Delivery","ko":"독백","youtube":""},{"id":48,"en":"Scene Objective","ko":"장면 목표","youtube":""},{"id":49,"en":"One-Minute Speech","ko":"1분 스피치","youtube":""},{"id":50,"en":"Voice Recording Review","ko":"녹음 비교 평가","youtube":""}]}];
+const VOICE_LEVELS = [{"id":1,"title":"기초","items":[{"id":1,"en":"Body Scan","ko":"신체 긴장 관찰","youtube":""},{"id":2,"en":"Head Massage","ko":"헤드 마사지","youtube":"https://youtu.be/VBk-3W0e0v4?si=QvrDQ6i6AdvnwTu4"},{"id":3,"en":"Jaw Release","ko":"턱 이완","youtube":""},{"id":4,"en":"Natural Breath","ko":"자연호흡","youtube":"https://youtu.be/ndXdxpItYww?si=zZm_tkHGtEfZe9dy"},{"id":5,"en":"Thoracic Mobility","ko":"흉추 가동성","youtube":"https://youtu.be/9iHko2F81cE?si=SAP_8-7p_vHJwIYY"},{"id":6,"en":"S-Hiss","ko":"일정한 호기","youtube":""},{"id":7,"en":"Easy Onset","ko":"부드러운 발성 시작","youtube":""},{"id":8,"en":"Straw Phonation","ko":"빨대 발성","youtube":""},{"id":9,"en":"Gentle Humming","ko":"허밍","youtube":""},{"id":10,"en":"Comfortable Tone","ko":"편안한 지속 발성","youtube":""}]},{"id":2,"title":"제어","items":[{"id":11,"en":"Lip Trill","ko":"입술 트릴","youtube":""},{"id":12,"en":"Cup Bubble Phonation","ko":"물컵 발성","youtube":""},{"id":13,"en":"Pitch Glide","ko":"음높이 이동","youtube":""},{"id":14,"en":"Three-Pitch Pattern","ko":"3단 음높이","youtube":""},{"id":15,"en":"Soft-Medium Voice","ko":"음량 전환","youtube":""},{"id":16,"en":"M-N-NG Transition","ko":"비음 전환","youtube":""},{"id":17,"en":"Humming to Vowel","ko":"허밍·모음 연결","youtube":""},{"id":18,"en":"Resonant Syllables","ko":"공명 음절","youtube":""},{"id":19,"en":"Resonant Sentences","ko":"공명 문장","youtube":""},{"id":20,"en":"Voice-to-Speech","ko":"발성에서 말하기 연결","youtube":""}]},{"id":3,"title":"발음","items":[{"id":21,"en":"Vowel Precision","ko":"모음 정확도","youtube":""},{"id":22,"en":"Consonant Contrast","ko":"자음 구별","youtube":""},{"id":23,"en":"Final Consonants","ko":"받침 발음","youtube":""},{"id":24,"en":"Tongue Placement","ko":"혀의 위치","youtube":""},{"id":25,"en":"Tongue Twisters","ko":"잰말놀이","youtube":""},{"id":26,"en":"Rising-Falling Intonation","ko":"상승·하강 억양","youtube":""},{"id":27,"en":"Contrastive Stress","ko":"강세 전환","youtube":""},{"id":28,"en":"Rhythm Reading","ko":"리듬 낭독","youtube":""},{"id":29,"en":"Tempo Variation","ko":"속도 조절","youtube":""},{"id":30,"en":"Semantic Pausing","ko":"의미 단위 쉼","youtube":""}]},{"id":4,"title":"표현","items":[{"id":31,"en":"Volume Scale","ko":"음량 조절","youtube":""},{"id":32,"en":"Projection Without Shouting","ko":"소리 지르지 않는 투사","youtube":""},{"id":33,"en":"Clear Speech","ko":"명료한 말하기","youtube":""},{"id":34,"en":"Key Message Delivery","ko":"핵심 메시지 전달","youtube":""},{"id":35,"en":"Emotion Contrast","ko":"감정 변화","youtube":""},{"id":36,"en":"Emotional Restraint","ko":"절제된 감정","youtube":""},{"id":37,"en":"Action Verb Reading","ko":"행동 의도 표현","youtube":""},{"id":38,"en":"Intention Shift","ko":"의도 전환","youtube":""},{"id":39,"en":"Hidden Meaning","ko":"서브텍스트","youtube":""},{"id":40,"en":"Character Vocal Profile","ko":"캐릭터 음성","youtube":""}]},{"id":5,"title":"실전","items":[{"id":41,"en":"First-Sight Reading","ko":"초견 낭독","youtube":""},{"id":42,"en":"News Anchor Reading","ko":"뉴스 리딩","youtube":""},{"id":43,"en":"Numbers & Names","ko":"숫자·고유명사","youtube":""},{"id":44,"en":"Studio Reading","ko":"마이크 리딩","youtube":""},{"id":45,"en":"Narration Reading","ko":"내레이션","youtube":""},{"id":46,"en":"Dialogue Exchange","ko":"대사 교환","youtube":""},{"id":47,"en":"Monologue Delivery","ko":"독백","youtube":""},{"id":48,"en":"Scene Objective","ko":"장면 목표","youtube":""},{"id":49,"en":"One-Minute Speech","ko":"1분 스피치","youtube":""},{"id":50,"en":"Voice Recording Review","ko":"녹음 비교 평가","youtube":""}]}];
 function youtubeId(url) {
   if (!url) return '';
   try {
@@ -43,6 +43,7 @@ function readVoiceLinks() {
   } catch { return {}; }
 }
 const VOICE_TIME_KEY='voice-flow-hub-timestamps-v1';
+const DEFAULT_VOICE_TIMES = {2:[0,65,104,190,275,345,425,493,546],5:[0]};
 function readVoiceTimes() {
   try {
     const saved=JSON.parse(localStorage.getItem(VOICE_TIME_KEY)||'{}');
@@ -103,14 +104,14 @@ function VoiceTraining() {
   function addTimestamp(id) {
     const value=parseVoiceTime(timeDraft);
     if(value===null){setMessage('시간을 01:20 또는 00:01:20 형식으로 입력해 줘.');return;}
-    const current=times[id]||[0];
+    const current=times[id]||DEFAULT_VOICE_TIMES[id]||[0];
     const next={...times,[id]:[...new Set([...current,value])].sort((a,b)=>a-b)};
     try{localStorage.setItem(VOICE_TIME_KEY,JSON.stringify(next))}catch{setMessage('시간 버튼 저장에 실패했어.');return;}
     setTimes(next);setTimeDraft('');setMessage('');
   }
   function deleteTimestamp(id,value) {
     if(value===0)return;
-    const next={...times,[id]:(times[id]||[0]).filter(t=>t!==value)};
+    const next={...times,[id]:(times[id]||DEFAULT_VOICE_TIMES[id]||[0]).filter(t=>t!==value)};
     try{localStorage.setItem(VOICE_TIME_KEY,JSON.stringify(next))}catch{return;}
     setTimes(next);
   }
@@ -141,8 +142,8 @@ function VoiceTraining() {
         </form>}
         {isOpen && <div className="voice-video-content">{video ?
           <>
-            {item.id===5 && <div className="voice-time-panel">
-              <div className="voice-time-buttons">{(times[item.id]||[0]).map(seconds=><span className="voice-time-chip" key={seconds}>
+            {(item.id===2 || item.id===5) && <div className="voice-time-panel">
+              <div className="voice-time-buttons">{(times[item.id]||DEFAULT_VOICE_TIMES[item.id]||[0]).map(seconds=><span className="voice-time-chip" key={seconds}>
                 <button className={Number(activeStart[item.id]||0)===seconds?'active':''} type="button" onClick={()=>setActiveStart(prev=>({...prev,[item.id]:seconds}))}>{formatVoiceTime(seconds)}</button>
                 {seconds!==0&&<button type="button" className="voice-time-remove" aria-label={formatVoiceTime(seconds)+' 삭제'} onClick={()=>deleteTimestamp(item.id,seconds)}>×</button>}
               </span>)}</div>
@@ -152,7 +153,7 @@ function VoiceTraining() {
               </form>
               {message&&<p className="voice-link-error" role="alert">{message}</p>}
             </div>}
-            <div className="voice-video-wrap"><iframe key={video+'-'+(item.id===5?Number(activeStart[item.id]||0):0)} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+(item.id===5?'?start='+Number(activeStart[item.id]||0):'')} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
+            <div className="voice-video-wrap"><iframe key={video+'-'+((item.id===2 || item.id===5)?Number(activeStart[item.id]||0):0)} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+((item.id===2 || item.id===5)?'?start='+Number(activeStart[item.id]||0):'')} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
           </>:
           <div className="voice-video-wait"><span>영상 링크 등록 대기</span><small>오른쪽 링크 아이콘을 눌러 유튜브 주소를 등록해 줘.</small></div>}
         </div>}
