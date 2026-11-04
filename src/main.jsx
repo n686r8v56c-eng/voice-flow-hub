@@ -4,7 +4,7 @@ import {ChevronDown,ExternalLink,Settings2,X,Check,Link2,Trash2,ShieldCheck,Refr
 import './style.css';
 
 const HUB = "Voice Flow";
-const MODES = [["sing","Sing","https://sing-flow.pages.dev/"],["voice","Voice",""],["expression","Expression",""],["dance","Dance",""],["muscle","Muscle",""]].map(([id,label,url])=>({id,label,defaultUrl:url}));
+const MODES = [["expression","Expression",""],["voice","Voice",""],["sing","Sing","https://sing-flow.pages.dev/"],["dance","Dance",""],["muscle","Muscle",""]].map(([id,label,url])=>({id,label,defaultUrl:url}));
 const STORAGE_KEY = 'flow-hub-links-v1-' + HUB.toLowerCase().replace(/\W+/g,'-');
 const sanitizeUrl = value => {
   try {
