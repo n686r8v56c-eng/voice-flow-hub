@@ -2,6 +2,7 @@ import React, {useEffect,useState,useRef} from 'react';
 import {createRoot} from 'react-dom/client';
 import {ChevronDown,ExternalLink,Settings2,X,Check,Link2,Trash2,ShieldCheck,RefreshCw,MonitorSmartphone} from 'lucide-react';
 import './style.css';
+import {voiceSupabase} from './voiceSupabase';
 
 const HUB = "Voice Flow";
 const MODES = [["expression","Expression",""],["voice","Voice",""],["playlist","Playlist",""],["sing","Sing","https://sing-flow.pages.dev/"],["dance","Dance",""],["muscle","Muscle",""]].map(([id,label,url])=>({id,label,defaultUrl:url}));
@@ -72,7 +73,7 @@ function readVoiceTimes() {
     }
     return values;
   } catch {return {};}
-
+}
 function parseVoiceTime(value) {
   const parts=String(value||'').trim().split(':');
   if (parts.length!==2 && parts.length!==3) return null;
@@ -85,56 +86,154 @@ function formatVoiceTime(seconds) {
   const s=Math.floor(seconds),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;
   return (h?h+':'+String(m).padStart(2,'0'):String(m).padStart(2,'0'))+':'+String(sec).padStart(2,'0');
 }
+
 function VoiceTraining() {
   const [level,setLevel] = useState(0);
   const [opened,setOpened] = useState(null);
-  const [links,setLinks] = useState(readVoiceLinks);
+  const [links,setLinks] = useState({});
   const [editing,setEditing] = useState(null);
   const [draft,setDraft] = useState('');
   const [message,setMessage] = useState('');
-  const [times,setTimes] = useState(readVoiceTimes);
+  const [times,setTimes] = useState({});
   const [activeStart,setActiveStart] = useState({});
+  const [session,setSession] = useState(null);
+  const [authReady,setAuthReady] = useState(false);
+  const [dataReady,setDataReady] = useState(false);
+  const [authMode,setAuthMode] = useState('login');
+  const [email,setEmail] = useState('');
+  const [password,setPassword] = useState('');
+  const [authBusy,setAuthBusy] = useState(false);
+  const [syncError,setSyncError] = useState('');
   const videoFrames=useRef({});
-  function seekToDrill(id,seconds) {
+  const userId=session?.user?.id;
+
+  useEffect(()=>{
+    let alive=true;
+    voiceSupabase.auth.getSession().then(({data,error})=>{
+      if(!alive)return;
+      if(error)setSyncError(error.message);
+      setSession(data?.session||null);setAuthReady(true);
+    }).catch(err=>{if(alive){setSyncError(err.message);setAuthReady(true)}});
+    const {data:{subscription}}=voiceSupabase.auth.onAuthStateChange((_event,next)=>{
+      if(alive)setSession(next);
+    });
+    return ()=>{alive=false;subscription.unsubscribe()};
+  },[]);
+
+  useEffect(()=>{
+    if(!userId){setLinks({});setTimes({});setDataReady(false);return;}
+    let alive=true;
+    setDataReady(false);setSyncError('');
+    async function load(){
+      try {
+        const {data,error}=await voiceSupabase.from('voice_studio_drills')
+          .select('drill_id,video_url,timestamps').eq('user_id',userId);
+        if(error)throw error;
+        const remote={};
+        for(const entry of data||[])remote[entry.drill_id]=entry;
+        const localLinks=readVoiceLinks(),localTimes=readVoiceTimes();
+        const imports=[];
+        for(const [key,url] of Object.entries(localLinks)){
+          const id=Number(key);
+          if(!Number.isInteger(id)||id<1||id>50||!youtubeId(url)||remote[id])continue;
+          imports.push({user_id:userId,drill_id:id,video_url:url,timestamps:localTimes[id]||DEFAULT_VOICE_TIMES[id]||[0]});
+        }
+        if(imports.length){
+          const {error:importError}=await voiceSupabase.from('voice_studio_drills')
+            .upsert(imports,{onConflict:'user_id,drill_id',ignoreDuplicates:true});
+          if(importError)throw importError;
+          for(const entry of imports)remote[entry.drill_id]=entry;
+        }
+        if(!alive)return;
+        const cloudLinks={},cloudTimes={};
+        for(const entry of Object.values(remote)){
+          if(entry.video_url)cloudLinks[entry.drill_id]=entry.video_url;
+          if(Array.isArray(entry.timestamps))cloudTimes[entry.drill_id]=entry.timestamps;
+        }
+        setLinks(cloudLinks);setTimes(cloudTimes);setDataReady(true);
+      }catch(err){if(alive){setSyncError('동기화에 실패했어. Supabase 테이블 설정을 확인해 줘: '+err.message);setDataReady(true)}}
+    }
+    load();
+    return ()=>{alive=false};
+  },[userId]);
+
+  async function submitAuth(event){
+    event.preventDefault();setAuthBusy(true);setSyncError('');
+    try{
+      const credentials={email:email.trim(),password};
+      const {data,error}=authMode==='signup'
+        ?await voiceSupabase.auth.signUp(credentials)
+        :await voiceSupabase.auth.signInWithPassword(credentials);
+      if(error)throw error;
+      if(authMode==='signup' && !data.session)setSyncError('이메일 확인 링크를 열어 가입을 완료한 다음 로그인해 줘.');
+      setPassword('');
+    }catch(err){setSyncError(err.message)}
+    finally{setAuthBusy(false)}
+  }
+
+  async function saveLink(id,raw) {
+    const url=String(raw||'').trim();
+    if(!youtubeId(url)){setMessage('올바른 유튜브 영상 링크를 붙여넣어 줘.');return;}
+    setMessage('');
+    const row={user_id:userId,drill_id:id,video_url:url,timestamps:times[id]||DEFAULT_VOICE_TIMES[id]||[0]};
+    const {error}=await voiceSupabase.from('voice_studio_drills')
+      .upsert(row,{onConflict:'user_id,drill_id'});
+    if(error){setMessage('서버 저장 실패: '+error.message);return;}
+    setLinks(prev=>({...prev,[id]:url}));
+    setEditing(null);setDraft('');setOpened(id);
+    try{
+      const local=readVoiceLinks();local[id]=url;
+      localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(local));
+    }catch{}
+  }
+  async function removeLink(id) {
+    setMessage('');
+    const {error}=await voiceSupabase.from('voice_studio_drills')
+      .upsert({user_id:userId,drill_id:id,video_url:null,timestamps:times[id]||DEFAULT_VOICE_TIMES[id]||[0]},
+        {onConflict:'user_id,drill_id'});
+    if(error){setMessage('삭제 실패: '+error.message);return;}
+    setLinks(prev=>{const next={...prev};delete next[id];return next});
+    setEditing(null);setDraft('');
+    try{const local=readVoiceLinks();delete local[id];localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(local))}catch{}
+  }
+  async function addFromClipboard(item){
+    setEditing(item.id);setDraft(links[item.id]||'');setMessage('');
+    try{
+      if(!navigator.clipboard?.readText)return;
+      const copied=await navigator.clipboard.readText();
+      if(youtubeId(copied.trim())){await saveLink(item.id,copied);return;}
+      if(copied.trim())setMessage('복사한 내용이 유튜브 링크가 아니야. 아래 입력창에 붙여넣어 줘.');
+    }catch{}
+  }
+  function seekToDrill(id,seconds){
     const frame=videoFrames.current[id];
-    if (!frame?.contentWindow) return;
-    // YouTube IFrame Player API: seek in-place so the existing player is never recreated.
+    if(!frame?.contentWindow)return;
     const send=(func,args=[])=>frame.contentWindow?.postMessage(JSON.stringify({event:'command',func,args}),'*');
-    send('seekTo',[seconds,true]);
-    send('playVideo');
+    send('seekTo',[seconds,true]);send('playVideo');
     setActiveStart(prev=>({...prev,[id]:seconds}));
   }
-  const selectLevel = i => {setLevel(i);setOpened(null);setEditing(null);setMessage('')};
-  function saveLink(id,raw) {
-    const url=String(raw||'').trim();
-    const vid=youtubeId(url);
-    if (!vid) {setMessage('올바른 유튜브 영상 링크를 붙여넣어 줘.');return;}
-    const next={...links,[id]:url};
-    try {localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(next))}
-    catch {setMessage('브라우저 저장소에 저장하지 못했어. 저장 공간을 확인해 줘.');return;}
-    setLinks(next);setEditing(null);setDraft('');setOpened(id);setMessage('');
-  }
-  async function addFromClipboard(item) {
-    setEditing(item.id);
-    setDraft(links[item.id]||'');
-    setMessage('');
-    try {
-      if (!navigator.clipboard?.readText) return;
-      const copied=await navigator.clipboard.readText();
-      if (youtubeId(copied.trim())) {saveLink(item.id,copied);return;}
-      if (copied.trim()) setMessage('복사한 내용이 유튜브 영상 링크가 아니야. 아래에 붙여넣어 줘.');
-    } catch {
-      // Clipboard read may be blocked in iOS or inside an iframe. Manual paste remains available.
-    }
-  }
-  function removeLink(id) {
-    const next={...links};delete next[id];
-    try {localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(next))}
-    catch {setMessage('삭제 내용을 저장하지 못했어.');return;}
-    setLinks(next);setDraft('');setMessage('');setEditing(null);
-  }
+
+  if(!authReady)return <div className="voice-auth-loading">로그인 확인 중…</div>;
+  if(!session)return <section className="voice-auth">
+    <form className="voice-auth-card" onSubmit={submitAuth}>
+      <h2>Voice Studio</h2>
+      <p>이메일로 로그인하면 영상 링크가 아이폰·아이패드·PC에 동기화돼.</p>
+      <div className="voice-auth-modes">
+        <button type="button" className={authMode==='login'?'selected':''} onClick={()=>{setAuthMode('login');setSyncError('')}}>로그인</button>
+        <button type="button" className={authMode==='signup'?'selected':''} onClick={()=>{setAuthMode('signup');setSyncError('')}}>회원가입</button>
+      </div>
+      <input type="email" autoComplete="email" required placeholder="이메일" aria-label="이메일" value={email} onChange={e=>setEmail(e.target.value)}/>
+      <input type="password" minLength={6} autoComplete={authMode==='signup'?'new-password':'current-password'} required placeholder="비밀번호" aria-label="비밀번호" value={password} onChange={e=>setPassword(e.target.value)}/>
+      <button className="primary" type="submit" disabled={authBusy}>{authBusy?'처리 중…':authMode==='login'?'이메일 로그인':'이메일 회원가입'}</button>
+      {syncError&&<p className="voice-link-error" role="status">{syncError}</p>}
+    </form>
+  </section>;
+  if(!dataReady)return <div className="voice-auth-loading">발성 Drill 동기화 중…</div>;
+
+  const selectLevel=i=>{setLevel(i);setOpened(null);setEditing(null);setMessage('')};
   return <section className="voice-training" aria-label="발성 훈련 50 Drill">
-    <div className="voice-heading"><div><strong>Voice Training</strong><span>5단계 × 10 Drill</span></div><small>LEVEL {level+1} / 5</small></div>
+    <div className="voice-heading"><div><strong>Voice Training</strong><span>5단계 × 10 Drill</span></div><button type="button" className="voice-logout" onClick={()=>voiceSupabase.auth.signOut()}>로그아웃</button></div>
+    {syncError&&<p className="voice-sync-alert" role="alert">{syncError}</p>}
     <nav className="voice-levels" aria-label="발성 훈련 단계">{VOICE_LEVELS.map((l,i)=><button type="button" className={level===i?'selected':''} aria-current={level===i?'step':undefined} onClick={()=>selectLevel(i)} key={l.id}><small>Lv.{l.id}</small><b>{l.title}</b></button>)}</nav>
     <div className="voice-list-title"><b>LEVEL {level+1} · {VOICE_LEVELS[level].title}</b><span>10 Drill</span></div>
     <div className="voice-list">{VOICE_LEVELS[level].items.map(item=>{
@@ -158,18 +257,15 @@ function VoiceTraining() {
           </div>
           {message&&<p role="alert" className="voice-link-error">{message}</p>}
         </form>}
-        {isOpen && <div className="voice-video-content">{video ?
-          <>
-            {(item.id===2 || item.id===6) && <div className="voice-time-panel">
-              <div className="voice-time-buttons">{(times[item.id]||DEFAULT_VOICE_TIMES[item.id]||[0]).map((seconds,index)=><button key={seconds} className={'voice-time-number'+(Number(activeStart[item.id]||0)===seconds?' active':'')} type="button" title={formatVoiceTime(seconds)+'부터 재생'} aria-label={(index+1)+'번 구간 '+formatVoiceTime(seconds)+'부터 재생'} onClick={()=>seekToDrill(item.id,seconds)}>{index+1}</button>)}</div>
-            </div>}
-            <div className="voice-video-wrap"><iframe key={video} ref={node=>{videoFrames.current[item.id]=node}} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+'?enablejsapi=1&playsinline=1&origin='+encodeURIComponent(window.location.origin)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
-          </>:
-          <div className="voice-video-wait"><span>영상 링크 등록 대기</span><small>오른쪽 링크 아이콘을 눌러 유튜브 주소를 등록해 줘.</small></div>}
-        </div>}
+        {isOpen && <div className="voice-video-content">{video ? <>
+          {(item.id===2 || item.id===6) && <div className="voice-time-panel">
+            <div className="voice-time-buttons">{(times[item.id]||DEFAULT_VOICE_TIMES[item.id]||[0]).map((seconds,index)=><button key={seconds} className={'voice-time-number'+(Number(activeStart[item.id]||0)===seconds?' active':'')} type="button" title={formatVoiceTime(seconds)+'부터 재생'} aria-label={(index+1)+'번 구간 '+formatVoiceTime(seconds)+'부터 재생'} onClick={()=>seekToDrill(item.id,seconds)}>{index+1}</button>)}</div>
+          </div>}
+          <div className="voice-video-wrap"><iframe key={video} ref={node=>{videoFrames.current[item.id]=node}} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+'?enablejsapi=1&playsinline=1&origin='+encodeURIComponent(window.location.origin)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
+        </> : <div className="voice-video-wait"><span>영상 링크 등록 대기</span><small>오른쪽 링크 아이콘을 눌러 유튜브 주소를 등록해 줘.</small></div>}</div>}
       </div>
     })}</div>
-    <p className="voice-storage-note">등록한 링크는 현재 기기의 브라우저에 저장돼. 다른 기기와는 아직 동기화되지 않아.</p>
+    <p className="voice-storage-note">로그인한 계정의 영상 링크는 Supabase에 저장돼. 이 기기의 기존 링크는 서버에 없는 항목만 최초 가져오기 해.</p>
   </section>;
 }
 
