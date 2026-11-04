@@ -4,6 +4,7 @@ import {ChevronDown,ExternalLink,Settings2,X,Check,Link2,Trash2,ShieldCheck,Refr
 import './style.css';
 import {ArchiveManager,readArchived} from './ArchiveManager';
 import {voiceSupabase} from './voiceSupabase';
+import VoiceStudio from './VoiceStudio';
 
 const HUB = "Voice Flow";
 const MODES = [["expression","Expression",""],["voice","Voice",""],["playlist","Playlist",""],["sing","Sing","https://sing-flow.pages.dev/"],["dance","Dance",""],["muscle","Muscle",""]].map(([id,label,url])=>({id,label,defaultUrl:url}));
@@ -353,7 +354,7 @@ function App() {
       </div>
     </div>
     <main className="frame-area">
-      {!selected ? <div className="empty"><h2>모든 프로젝트를 보관했어</h2><p>보관함에서 언제든 다시 꺼낼 수 있어.</p><button className="primary" type="button" onClick={()=>setArchiveOpen(true)}>보관함 · {archived.length}개</button></div> : selected === 'voice' ? <VoiceTraining/> : activeUrl ? <div className="empty"><div className="empty-icon"><ExternalLink size={25}/></div><h2>{current.label}</h2><p>로그인을 안정적으로 유지할 수 있도록 앱을 독립된 페이지로 열어 줘. 브라우저 뒤로 가기로 허브에 돌아올 수 있어.</p><a className="primary" href={activeUrl} style={{display:'inline-flex',alignItems:'center',gap:8,textDecoration:'none'}}><ExternalLink size={16}/> {current.label} 열기</a></div>:
+      {!selected ? <div className="empty"><h2>모든 프로젝트를 보관했어</h2><p>보관함에서 언제든 다시 꺼낼 수 있어.</p><button className="primary" type="button" onClick={()=>setArchiveOpen(true)}>보관함 · {archived.length}개</button></div> : selected === 'voice' ? <VoiceStudio/> : activeUrl ? <div className="empty"><div className="empty-icon"><ExternalLink size={25}/></div><h2>{current.label}</h2><p>로그인을 안정적으로 유지할 수 있도록 앱을 독립된 페이지로 열어 줘. 브라우저 뒤로 가기로 허브에 돌아올 수 있어.</p><a className="primary" href={activeUrl} style={{display:'inline-flex',alignItems:'center',gap:8,textDecoration:'none'}}><ExternalLink size={16}/> {current.label} 열기</a></div>:
         <div className="empty">
           <div className="empty-icon"><Link2 size={25}/></div>
           <h2>{current.label} 연결 준비</h2>
