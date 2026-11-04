@@ -1,6 +1,6 @@
 import React, {useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {ChevronDown,ExternalLink,Settings2,X,Check,Link2,ShieldCheck,RefreshCw,MonitorSmartphone} from 'lucide-react';
+import {ChevronDown,ExternalLink,Settings2,X,Check,Link2,Trash2,ShieldCheck,RefreshCw,MonitorSmartphone} from 'lucide-react';
 import './style.css';
 
 const HUB = "Voice Flow";
@@ -35,29 +35,81 @@ function youtubeId(url) {
   } catch {}
   return '';
 }
+const VOICE_LINKS_KEY = 'voice-flow-hub-drill-youtube-v1';
+function readVoiceLinks() {
+  try {
+    const value=JSON.parse(localStorage.getItem(VOICE_LINKS_KEY)||'{}');
+    return value && typeof value==='object' && !Array.isArray(value) ? value : {};
+  } catch { return {}; }
+}
 function VoiceTraining() {
   const [level,setLevel] = useState(0);
   const [opened,setOpened] = useState(null);
-  const selectLevel = i => {setLevel(i);setOpened(null)};
+  const [links,setLinks] = useState(readVoiceLinks);
+  const [editing,setEditing] = useState(null);
+  const [draft,setDraft] = useState('');
+  const [message,setMessage] = useState('');
+  const selectLevel = i => {setLevel(i);setOpened(null);setEditing(null);setMessage('')};
+  function saveLink(id,raw) {
+    const url=String(raw||'').trim();
+    const vid=youtubeId(url);
+    if (!vid) {setMessage('올바른 유튜브 영상 링크를 붙여넣어 줘.');return;}
+    const next={...links,[id]:url};
+    try {localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(next))}
+    catch {setMessage('브라우저 저장소에 저장하지 못했어. 저장 공간을 확인해 줘.');return;}
+    setLinks(next);setEditing(null);setDraft('');setOpened(id);setMessage('');
+  }
+  async function addFromClipboard(item) {
+    setEditing(item.id);
+    setDraft(links[item.id]||'');
+    setMessage('');
+    try {
+      if (!navigator.clipboard?.readText) return;
+      const copied=await navigator.clipboard.readText();
+      if (youtubeId(copied.trim())) {saveLink(item.id,copied);return;}
+      if (copied.trim()) setMessage('복사한 내용이 유튜브 영상 링크가 아니야. 아래에 붙여넣어 줘.');
+    } catch {
+      // Clipboard read may be blocked in iOS or inside an iframe. Manual paste remains available.
+    }
+  }
+  function removeLink(id) {
+    const next={...links};delete next[id];
+    try {localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(next))}
+    catch {setMessage('삭제 내용을 저장하지 못했어.');return;}
+    setLinks(next);setDraft('');setMessage('');setEditing(null);
+  }
   return <section className="voice-training" aria-label="발성 훈련 50 Drill">
     <div className="voice-heading"><div><strong>Voice Training</strong><span>5단계 × 10 Drill</span></div><small>LEVEL {level+1} / 5</small></div>
     <nav className="voice-levels" aria-label="발성 훈련 단계">{VOICE_LEVELS.map((l,i)=><button type="button" className={level===i?'selected':''} aria-current={level===i?'step':undefined} onClick={()=>selectLevel(i)} key={l.id}><small>Lv.{l.id}</small><b>{l.title}</b></button>)}</nav>
     <div className="voice-list-title"><b>LEVEL {level+1} · {VOICE_LEVELS[level].title}</b><span>10 Drill</span></div>
-    <div className="voice-list">{VOICE_LEVELS[level].items.map((item,i)=>{
+    <div className="voice-list">{VOICE_LEVELS[level].items.map(item=>{
       const isOpen=opened===item.id;
-      const video=youtubeId(item.youtube);
+      const video=youtubeId(links[item.id]||item.youtube);
       return <div className="voice-drill" key={item.id}>
-        <button type="button" className="voice-drill-heading" aria-expanded={isOpen} onClick={()=>setOpened(isOpen?null:item.id)}>
-          <span className="voice-drill-number">{String(item.id).padStart(2,'0')}</span>
-          <span className="voice-drill-names"><b>{item.en}</b><small>{item.ko}</small></span>
-          <ChevronDown size={16} className={isOpen?'rotated':''}/>
-        </button>
+        <div className="voice-drill-row">
+          <button type="button" className="voice-drill-heading" aria-expanded={isOpen} onClick={()=>{setOpened(isOpen?null:item.id);setEditing(null);setMessage('')}}>
+            <span className="voice-drill-number">{String(item.id).padStart(2,'0')}</span>
+            <span className="voice-drill-names"><b>{item.en}</b><small>{item.ko}</small></span>
+            <ChevronDown size={16} className={isOpen?'rotated':''}/>
+          </button>
+          <button type="button" className={'voice-link-btn'+(video?' linked':'')} title={video?'유튜브 링크 수정':'복사한 유튜브 링크 등록'} aria-label={item.ko+' 유튜브 링크 '+(video?'수정':'등록')} onClick={()=>addFromClipboard(item)}><Link2 size={17}/></button>
+        </div>
+        {editing===item.id && <form className="voice-link-editor" onSubmit={e=>{e.preventDefault();saveLink(item.id,draft)}}>
+          <input aria-label={item.ko+' 유튜브 링크'} type="url" inputMode="url" placeholder="유튜브 URL 붙여넣기" autoCapitalize="off" autoCorrect="off" spellCheck="false" value={draft} onChange={e=>{setDraft(e.target.value);setMessage('')}}/>
+          <div className="voice-link-actions">
+            <button className="primary" type="submit"><Check size={15}/> 저장</button>
+            {video&&<button className="secondary" type="button" onClick={()=>removeLink(item.id)}><Trash2 size={15}/> 삭제</button>}
+            <button className="secondary" type="button" onClick={()=>{setEditing(null);setMessage('')}}>취소</button>
+          </div>
+          {message&&<p role="alert" className="voice-link-error">{message}</p>}
+        </form>}
         {isOpen && <div className="voice-video-content">{video ?
           <div className="voice-video-wrap"><iframe title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>:
-          <div className="voice-video-wait"><span>영상 링크 등록 대기</span><small>유튜브 링크가 연결되면 이곳에서 바로 재생할 수 있어.</small></div>}
+          <div className="voice-video-wait"><span>영상 링크 등록 대기</span><small>오른쪽 링크 아이콘을 눌러 유튜브 주소를 등록해 줘.</small></div>}
         </div>}
       </div>
     })}</div>
+    <p className="voice-storage-note">등록한 링크는 현재 기기의 브라우저에 저장돼. 다른 기기와는 아직 동기화되지 않아.</p>
   </section>;
 }
 
