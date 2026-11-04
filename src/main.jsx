@@ -1,4 +1,4 @@
-import React, {useEffect,useState} from 'react';
+import React, {useEffect,useState,useRef} from 'react';
 import {createRoot} from 'react-dom/client';
 import {ChevronDown,ExternalLink,Settings2,X,Check,Link2,Trash2,ShieldCheck,RefreshCw,MonitorSmartphone} from 'lucide-react';
 import './style.css';
@@ -79,6 +79,16 @@ function VoiceTraining() {
   const [message,setMessage] = useState('');
   const [times,setTimes] = useState(readVoiceTimes);
   const [activeStart,setActiveStart] = useState({});
+  const videoFrames=useRef({});
+  function seekToDrill(id,seconds) {
+    const frame=videoFrames.current[id];
+    if (!frame?.contentWindow) return;
+    // YouTube IFrame Player API: seek in-place so the existing player is never recreated.
+    const send=(func,args=[])=>frame.contentWindow?.postMessage(JSON.stringify({event:'command',func,args}),'*');
+    send('seekTo',[seconds,true]);
+    send('playVideo');
+    setActiveStart(prev=>({...prev,[id]:seconds}));
+  }
   const selectLevel = i => {setLevel(i);setOpened(null);setEditing(null);setMessage('')};
   function saveLink(id,raw) {
     const url=String(raw||'').trim();
@@ -136,9 +146,9 @@ function VoiceTraining() {
         {isOpen && <div className="voice-video-content">{video ?
           <>
             {(item.id===2 || item.id===5) && <div className="voice-time-panel">
-              <div className="voice-time-buttons">{(times[item.id]||DEFAULT_VOICE_TIMES[item.id]||[0]).map((seconds,index)=><button key={seconds} className={'voice-time-number'+(Number(activeStart[item.id]||0)===seconds?' active':'')} type="button" title={formatVoiceTime(seconds)+'부터 재생'} aria-label={(index+1)+'번 구간 '+formatVoiceTime(seconds)+'부터 재생'} onClick={()=>setActiveStart(prev=>({...prev,[item.id]:seconds}))}>{index+1}</button>)}</div>
+              <div className="voice-time-buttons">{(times[item.id]||DEFAULT_VOICE_TIMES[item.id]||[0]).map((seconds,index)=><button key={seconds} className={'voice-time-number'+(Number(activeStart[item.id]||0)===seconds?' active':'')} type="button" title={formatVoiceTime(seconds)+'부터 재생'} aria-label={(index+1)+'번 구간 '+formatVoiceTime(seconds)+'부터 재생'} onClick={()=>seekToDrill(item.id,seconds)}>{index+1}</button>)}</div>
             </div>}
-            <div className="voice-video-wrap"><iframe key={video+'-'+((item.id===2 || item.id===5)?Number(activeStart[item.id]||0):0)} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+((item.id===2 || item.id===5)?'?start='+Number(activeStart[item.id]||0):'')} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
+            <div className="voice-video-wrap"><iframe key={video} ref={node=>{videoFrames.current[item.id]=node}} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+'?enablejsapi=1&playsinline=1&origin='+encodeURIComponent(window.location.origin)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
           </>:
           <div className="voice-video-wait"><span>영상 링크 등록 대기</span><small>오른쪽 링크 아이콘을 눌러 유튜브 주소를 등록해 줘.</small></div>}
         </div>}
