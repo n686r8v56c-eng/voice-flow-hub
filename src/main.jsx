@@ -131,18 +131,26 @@ function VoiceTraining() {
         if(error)throw error;
         const remote={};
         for(const entry of data||[])remote[entry.drill_id]=entry;
-        const localLinks=readVoiceLinks(),localTimes=readVoiceTimes();
-        const imports=[];
-        for(const [key,url] of Object.entries(localLinks)){
-          const id=Number(key);
-          if(!Number.isInteger(id)||id<1||id>50||!youtubeId(url)||remote[id])continue;
-          imports.push({user_id:userId,drill_id:id,video_url:url,timestamps:localTimes[id]||DEFAULT_VOICE_TIMES[id]||[0]});
-        }
-        if(imports.length){
-          const {error:importError}=await voiceSupabase.from('voice_studio_drills')
-            .upsert(imports,{onConflict:'user_id,drill_id',ignoreDuplicates:true});
-          if(importError)throw importError;
-          for(const entry of imports)remote[entry.drill_id]=entry;
+        // Import legacy local data only for the first account to claim this browser.
+        // Never transfer a prior account's local backup into a different account.
+        const migrationOwner=localStorage.getItem('voice-studio-migration-owner-v1');
+        if(!migrationOwner || migrationOwner===userId){
+          const localLinks=readVoiceLinks(),localTimes=readVoiceTimes();
+          const imports=[];
+          if(!migrationOwner){
+            for(const [key,url] of Object.entries(localLinks)){
+              const id=Number(key);
+              if(!Number.isInteger(id)||id<1||id>50||!youtubeId(url)||remote[id])continue;
+              imports.push({user_id:userId,drill_id:id,video_url:url,timestamps:localTimes[id]||DEFAULT_VOICE_TIMES[id]||[0]});
+            }
+          }
+          if(imports.length){
+            const {error:importError}=await voiceSupabase.from('voice_studio_drills')
+              .upsert(imports,{onConflict:'user_id,drill_id',ignoreDuplicates:true});
+            if(importError)throw importError;
+            for(const entry of imports)remote[entry.drill_id]=entry;
+          }
+          if(!migrationOwner)localStorage.setItem('voice-studio-migration-owner-v1',userId);
         }
         if(!alive)return;
         const cloudLinks={},cloudTimes={};
@@ -181,10 +189,6 @@ function VoiceTraining() {
     if(error){setMessage('서버 저장 실패: '+error.message);return;}
     setLinks(prev=>({...prev,[id]:url}));
     setEditing(null);setDraft('');setOpened(id);
-    try{
-      const local=readVoiceLinks();local[id]=url;
-      localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(local));
-    }catch{}
   }
   async function removeLink(id) {
     setMessage('');
@@ -194,7 +198,6 @@ function VoiceTraining() {
     if(error){setMessage('삭제 실패: '+error.message);return;}
     setLinks(prev=>{const next={...prev};delete next[id];return next});
     setEditing(null);setDraft('');
-    try{const local=readVoiceLinks();delete local[id];localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(local))}catch{}
   }
   async function addFromClipboard(item){
     setEditing(item.id);setDraft(links[item.id]||'');setMessage('');
