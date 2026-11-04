@@ -78,7 +78,6 @@ function VoiceTraining() {
   const [draft,setDraft] = useState('');
   const [message,setMessage] = useState('');
   const [times,setTimes] = useState(readVoiceTimes);
-  const [timeDraft,setTimeDraft] = useState('');
   const [activeStart,setActiveStart] = useState({});
   const selectLevel = i => {setLevel(i);setOpened(null);setEditing(null);setMessage('')};
   function saveLink(id,raw) {
@@ -109,20 +108,6 @@ function VoiceTraining() {
     catch {setMessage('삭제 내용을 저장하지 못했어.');return;}
     setLinks(next);setDraft('');setMessage('');setEditing(null);
   }
-  function addTimestamp(id) {
-    const value=parseVoiceTime(timeDraft);
-    if(value===null){setMessage('시간을 01:20 또는 00:01:20 형식으로 입력해 줘.');return;}
-    const current=times[id]||DEFAULT_VOICE_TIMES[id]||[0];
-    const next={...times,[id]:[...new Set([...current,value])].sort((a,b)=>a-b)};
-    try{localStorage.setItem(VOICE_TIME_KEY,JSON.stringify(next))}catch{setMessage('시간 버튼 저장에 실패했어.');return;}
-    setTimes(next);setTimeDraft('');setMessage('');
-  }
-  function deleteTimestamp(id,value) {
-    if(value===0)return;
-    const next={...times,[id]:(times[id]||DEFAULT_VOICE_TIMES[id]||[0]).filter(t=>t!==value)};
-    try{localStorage.setItem(VOICE_TIME_KEY,JSON.stringify(next))}catch{return;}
-    setTimes(next);
-  }
   return <section className="voice-training" aria-label="발성 훈련 50 Drill">
     <div className="voice-heading"><div><strong>Voice Training</strong><span>5단계 × 10 Drill</span></div><small>LEVEL {level+1} / 5</small></div>
     <nav className="voice-levels" aria-label="발성 훈련 단계">{VOICE_LEVELS.map((l,i)=><button type="button" className={level===i?'selected':''} aria-current={level===i?'step':undefined} onClick={()=>selectLevel(i)} key={l.id}><small>Lv.{l.id}</small><b>{l.title}</b></button>)}</nav>
@@ -151,15 +136,7 @@ function VoiceTraining() {
         {isOpen && <div className="voice-video-content">{video ?
           <>
             {(item.id===2 || item.id===5) && <div className="voice-time-panel">
-              <div className="voice-time-buttons">{(times[item.id]||DEFAULT_VOICE_TIMES[item.id]||[0]).map(seconds=><span className="voice-time-chip" key={seconds}>
-                <button className={Number(activeStart[item.id]||0)===seconds?'active':''} type="button" onClick={()=>setActiveStart(prev=>({...prev,[item.id]:seconds}))}>{formatVoiceTime(seconds)}</button>
-                {seconds!==0&&<button type="button" className="voice-time-remove" aria-label={formatVoiceTime(seconds)+' 삭제'} onClick={()=>deleteTimestamp(item.id,seconds)}>×</button>}
-              </span>)}</div>
-              <form className="voice-time-add" onSubmit={e=>{e.preventDefault();addTimestamp(item.id)}}>
-                <input aria-label="구간 시작 시간" placeholder="예: 01:20" inputMode="text" value={timeDraft} onChange={e=>{setTimeDraft(e.target.value);setMessage('')}}/>
-                <button type="submit">+ 시간</button>
-              </form>
-              {message&&<p className="voice-link-error" role="alert">{message}</p>}
+              <div className="voice-time-buttons">{(times[item.id]||DEFAULT_VOICE_TIMES[item.id]||[0]).map((seconds,index)=><button key={seconds} className={'voice-time-number'+(Number(activeStart[item.id]||0)===seconds?' active':'')} type="button" title={formatVoiceTime(seconds)+'부터 재생'} aria-label={(index+1)+'번 구간 '+formatVoiceTime(seconds)+'부터 재생'} onClick={()=>setActiveStart(prev=>({...prev,[item.id]:seconds}))}>{index+1}</button>)}</div>
             </div>}
             <div className="voice-video-wrap"><iframe key={video+'-'+((item.id===2 || item.id===5)?Number(activeStart[item.id]||0):0)} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+((item.id===2 || item.id===5)?'?start='+Number(activeStart[item.id]||0):'')} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
           </>:
