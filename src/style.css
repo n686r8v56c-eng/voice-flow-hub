@@ -99,3 +99,15 @@
 .voice-link-actions button{min-height:35px;padding:7px 11px;font-size:13px}
 .voice-link-error{font-size:13px;color:#a52a59;margin:0}
 .voice-storage-note{margin:16px 3px 0;color:#91869e;font-size:13px;line-height:1.5}
+
+
+/* Timestamp-only video seek controls (Thoracic Mobility) */
+.voice-time-panel{display:flex;flex-direction:column;gap:8px;margin:0 0 10px}
+.voice-time-buttons{display:flex;flex-wrap:wrap;gap:6px}
+.voice-time-chip{display:inline-flex;align-items:center;border-radius:8px;background:#f4eefb;border:1px solid #e2d6f0;overflow:hidden}
+.voice-time-chip button{border:0;background:transparent;padding:7px 10px;color:#71518f;font-size:13px;font-weight:650;font-variant-numeric:tabular-nums}
+.voice-time-chip button.active{background:#decdf2;color:#4d2777}
+.voice-time-chip .voice-time-remove{font-size:16px;padding:5px 7px;color:#877394;border-left:1px solid #e1d3ee}
+.voice-time-add{display:flex;align-items:center;gap:6px}
+.voice-time-add input{min-width:0;width:112px;height:35px;padding:5px 9px;border:1px solid #dbceeb;border-radius:8px;background:white;font-size:16px}
+.voice-time-add button{padding:8px 11px;border-radius:8px;background:#eee5f9;color:#6c488e;font-size:13px;font-weight:650;white-space:nowrap}
