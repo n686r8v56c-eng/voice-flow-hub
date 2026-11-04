@@ -175,3 +175,9 @@
 .voice-canonical{padding-bottom:0}
 .voice-canonical .voice-training{min-height:0;height:auto;overflow:visible}
 @media(min-width:650px){.voice-home-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* Keep native Voice Studio contained in the hub's available frame and scroll locally. */
+.frame-area:has(.voice-canonical){overflow-y:auto;overscroll-behavior:contain}
+.frame-area .voice-canonical{min-height:100%;height:auto}
+.frame-area .voice-studio-bottom{position:sticky;bottom:0}
+.frame-area .voice-studio-content{min-height:calc(100% - 108px)}
