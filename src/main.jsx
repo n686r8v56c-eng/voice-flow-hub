@@ -42,6 +42,25 @@ function readVoiceLinks() {
     return value && typeof value==='object' && !Array.isArray(value) ? value : {};
   } catch { return {}; }
 }
+const VOICE_TIME_KEY='voice-flow-hub-timestamps-v1';
+function readVoiceTimes() {
+  try {
+    const saved=JSON.parse(localStorage.getItem(VOICE_TIME_KEY)||'{}');
+    return saved && typeof saved==='object' && !Array.isArray(saved) ? saved : {};
+  } catch {return {};}
+}
+function parseVoiceTime(value) {
+  const parts=String(value||'').trim().split(':');
+  if (parts.length!==2 && parts.length!==3) return null;
+  if (!parts.every(p=>/^\d+$/.test(p))) return null;
+  const nums=parts.map(Number);
+  if (nums.slice(1).some(n=>n>59)) return null;
+  return nums.reduce((a,b)=>a*60+b,0);
+}
+function formatVoiceTime(seconds) {
+  const s=Math.floor(seconds),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;
+  return (h?h+':'+String(m).padStart(2,'0'):String(m).padStart(2,'0'))+':'+String(sec).padStart(2,'0');
+}
 function VoiceTraining() {
   const [level,setLevel] = useState(0);
   const [opened,setOpened] = useState(null);
@@ -49,6 +68,9 @@ function VoiceTraining() {
   const [editing,setEditing] = useState(null);
   const [draft,setDraft] = useState('');
   const [message,setMessage] = useState('');
+  const [times,setTimes] = useState(readVoiceTimes);
+  const [timeDraft,setTimeDraft] = useState('');
+  const [activeStart,setActiveStart] = useState({});
   const selectLevel = i => {setLevel(i);setOpened(null);setEditing(null);setMessage('')};
   function saveLink(id,raw) {
     const url=String(raw||'').trim();
@@ -78,6 +100,20 @@ function VoiceTraining() {
     catch {setMessage('삭제 내용을 저장하지 못했어.');return;}
     setLinks(next);setDraft('');setMessage('');setEditing(null);
   }
+  function addTimestamp(id) {
+    const value=parseVoiceTime(timeDraft);
+    if(value===null){setMessage('시간을 01:20 또는 00:01:20 형식으로 입력해 줘.');return;}
+    const current=times[id]||[0];
+    const next={...times,[id]:[...new Set([...current,value])].sort((a,b)=>a-b)};
+    try{localStorage.setItem(VOICE_TIME_KEY,JSON.stringify(next))}catch{setMessage('시간 버튼 저장에 실패했어.');return;}
+    setTimes(next);setTimeDraft('');setMessage('');
+  }
+  function deleteTimestamp(id,value) {
+    if(value===0)return;
+    const next={...times,[id]:(times[id]||[0]).filter(t=>t!==value)};
+    try{localStorage.setItem(VOICE_TIME_KEY,JSON.stringify(next))}catch{return;}
+    setTimes(next);
+  }
   return <section className="voice-training" aria-label="발성 훈련 50 Drill">
     <div className="voice-heading"><div><strong>Voice Training</strong><span>5단계 × 10 Drill</span></div><small>LEVEL {level+1} / 5</small></div>
     <nav className="voice-levels" aria-label="발성 훈련 단계">{VOICE_LEVELS.map((l,i)=><button type="button" className={level===i?'selected':''} aria-current={level===i?'step':undefined} onClick={()=>selectLevel(i)} key={l.id}><small>Lv.{l.id}</small><b>{l.title}</b></button>)}</nav>
@@ -104,7 +140,20 @@ function VoiceTraining() {
           {message&&<p role="alert" className="voice-link-error">{message}</p>}
         </form>}
         {isOpen && <div className="voice-video-content">{video ?
-          <div className="voice-video-wrap"><iframe title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>:
+          <>
+            {item.id===5 && <div className="voice-time-panel">
+              <div className="voice-time-buttons">{(times[item.id]||[0]).map(seconds=><span className="voice-time-chip" key={seconds}>
+                <button className={Number(activeStart[item.id]||0)===seconds?'active':''} type="button" onClick={()=>setActiveStart(prev=>({...prev,[item.id]:seconds}))}>{formatVoiceTime(seconds)}</button>
+                {seconds!==0&&<button type="button" className="voice-time-remove" aria-label={formatVoiceTime(seconds)+' 삭제'} onClick={()=>deleteTimestamp(item.id,seconds)}>×</button>}
+              </span>)}</div>
+              <form className="voice-time-add" onSubmit={e=>{e.preventDefault();addTimestamp(item.id)}}>
+                <input aria-label="구간 시작 시간" placeholder="예: 01:20" inputMode="text" value={timeDraft} onChange={e=>{setTimeDraft(e.target.value);setMessage('')}}/>
+                <button type="submit">+ 시간</button>
+              </form>
+              {message&&<p className="voice-link-error" role="alert">{message}</p>}
+            </div>}
+            <div className="voice-video-wrap"><iframe key={video+'-'+(item.id===5?Number(activeStart[item.id]||0):0)} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+(item.id===5?'?start='+Number(activeStart[item.id]||0):'')} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
+          </>:
           <div className="voice-video-wait"><span>영상 링크 등록 대기</span><small>오른쪽 링크 아이콘을 눌러 유튜브 주소를 등록해 줘.</small></div>}
         </div>}
       </div>
