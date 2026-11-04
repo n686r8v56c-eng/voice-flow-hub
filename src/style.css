@@ -111,3 +111,8 @@
 .voice-time-add{display:flex;align-items:center;gap:6px}
 .voice-time-add input{min-width:0;width:112px;height:35px;padding:5px 9px;border:1px solid #dbceeb;border-radius:8px;background:white;font-size:16px}
 .voice-time-add button{padding:8px 11px;border-radius:8px;background:#eee5f9;color:#6c488e;font-size:13px;font-weight:650;white-space:nowrap}
+
+
+/* Fixed numbered timestamp buttons */
+.voice-time-number{min-width:34px;height:32px;padding:0 9px;border:1px solid #e2d6f0;border-radius:8px;background:#f4eefb;color:#71518f;font-size:14px;font-weight:650;font-variant-numeric:tabular-nums}
+.voice-time-number.active{background:#decdf2;border-color:#b99ad8;color:#4d2777}
