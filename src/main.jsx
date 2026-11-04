@@ -325,7 +325,7 @@ function App() {
       </div>
       <div className="top-actions">
         <label className="mode-select"><span className="sr-only">앱 선택</span>
-          <select value={selected} onChange={e=>{if(e.target.value==='__archive__'){setSettings(false);setArchiveOpen(true)}else {const id=e.target.value;setSelected(id);const mode=visibleModes.find(m=>m.id===id);const url=sanitizeUrl(Object.prototype.hasOwnProperty.call(links,id)?String(links[id]||''):mode?.defaultUrl||'');if(url)window.location.assign(url);}}} aria-label="앱 전환">
+          <select value={selected} onChange={e=>{if(e.target.value==='__archive__'){setSettings(false);setArchiveOpen(true)}else {const id=e.target.value;setSelected(id);if(id==='voice')return;const mode=visibleModes.find(m=>m.id===id);const url=sanitizeUrl(Object.prototype.hasOwnProperty.call(links,id)?String(links[id]||''):mode?.defaultUrl||'');if(url)window.location.assign(url);}}} aria-label="앱 전환">
             {!selected&&<option value="" disabled>사용 중인 프로젝트 없음</option>}
             {visibleModes.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}
             <option value="__archive__">보관함 · {archived.length}개</option>
@@ -349,7 +349,7 @@ function App() {
       <span className="app-name"><ShieldCheck size={14}/> {current.label} <i>독립 로그인 · DB 유지</i></span>
       <div className="strip-actions">
         
-        {activeUrl&&<a href={activeUrl} title="앱 열기"><ExternalLink size={15}/><span>앱 열기</span></a>}
+        {selected!=='voice'&&activeUrl&&<a href={activeUrl} title="앱 열기"><ExternalLink size={15}/><span>앱 열기</span></a>}
       </div>
     </div>
     <main className="frame-area">
