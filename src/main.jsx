@@ -22,7 +22,7 @@ function readSaved() {
   } catch { return {}; }
 }
 
-const VOICE_LEVELS = [{"id":1,"title":"기초","items":[{"id":1,"en":"Body Scan","ko":"신체 긴장 관찰","youtube":""},{"id":2,"en":"Head Massage","ko":"헤드 마사지","youtube":"https://youtu.be/VBk-3W0e0v4?si=QvrDQ6i6AdvnwTu4"},{"id":3,"en":"Jaw Release","ko":"턱 이완","youtube":""},{"id":4,"en":"Natural Breath","ko":"자연호흡","youtube":"https://youtu.be/ndXdxpItYww?si=zZm_tkHGtEfZe9dy"},{"id":5,"en":"Thoracic Mobility","ko":"흉추 가동성","youtube":"https://youtu.be/9iHko2F81cE?si=SAP_8-7p_vHJwIYY"},{"id":6,"en":"S-Hiss","ko":"일정한 호기","youtube":""},{"id":7,"en":"Easy Onset","ko":"부드러운 발성 시작","youtube":""},{"id":8,"en":"Straw Phonation","ko":"빨대 발성","youtube":""},{"id":9,"en":"Gentle Humming","ko":"허밍","youtube":""},{"id":10,"en":"Comfortable Tone","ko":"편안한 지속 발성","youtube":""}]},{"id":2,"title":"제어","items":[{"id":11,"en":"Lip Trill","ko":"입술 트릴","youtube":""},{"id":12,"en":"Cup Bubble Phonation","ko":"물컵 발성","youtube":""},{"id":13,"en":"Pitch Glide","ko":"음높이 이동","youtube":""},{"id":14,"en":"Three-Pitch Pattern","ko":"3단 음높이","youtube":""},{"id":15,"en":"Soft-Medium Voice","ko":"음량 전환","youtube":""},{"id":16,"en":"M-N-NG Transition","ko":"비음 전환","youtube":""},{"id":17,"en":"Humming to Vowel","ko":"허밍·모음 연결","youtube":""},{"id":18,"en":"Resonant Syllables","ko":"공명 음절","youtube":""},{"id":19,"en":"Resonant Sentences","ko":"공명 문장","youtube":""},{"id":20,"en":"Voice-to-Speech","ko":"발성에서 말하기 연결","youtube":""}]},{"id":3,"title":"발음","items":[{"id":21,"en":"Vowel Precision","ko":"모음 정확도","youtube":""},{"id":22,"en":"Consonant Contrast","ko":"자음 구별","youtube":""},{"id":23,"en":"Final Consonants","ko":"받침 발음","youtube":""},{"id":24,"en":"Tongue Placement","ko":"혀의 위치","youtube":""},{"id":25,"en":"Tongue Twisters","ko":"잰말놀이","youtube":""},{"id":26,"en":"Rising-Falling Intonation","ko":"상승·하강 억양","youtube":""},{"id":27,"en":"Contrastive Stress","ko":"강세 전환","youtube":""},{"id":28,"en":"Rhythm Reading","ko":"리듬 낭독","youtube":""},{"id":29,"en":"Tempo Variation","ko":"속도 조절","youtube":""},{"id":30,"en":"Semantic Pausing","ko":"의미 단위 쉼","youtube":""}]},{"id":4,"title":"표현","items":[{"id":31,"en":"Volume Scale","ko":"음량 조절","youtube":""},{"id":32,"en":"Projection Without Shouting","ko":"소리 지르지 않는 투사","youtube":""},{"id":33,"en":"Clear Speech","ko":"명료한 말하기","youtube":""},{"id":34,"en":"Key Message Delivery","ko":"핵심 메시지 전달","youtube":""},{"id":35,"en":"Emotion Contrast","ko":"감정 변화","youtube":""},{"id":36,"en":"Emotional Restraint","ko":"절제된 감정","youtube":""},{"id":37,"en":"Action Verb Reading","ko":"행동 의도 표현","youtube":""},{"id":38,"en":"Intention Shift","ko":"의도 전환","youtube":""},{"id":39,"en":"Hidden Meaning","ko":"서브텍스트","youtube":""},{"id":40,"en":"Character Vocal Profile","ko":"캐릭터 음성","youtube":""}]},{"id":5,"title":"실전","items":[{"id":41,"en":"First-Sight Reading","ko":"초견 낭독","youtube":""},{"id":42,"en":"News Anchor Reading","ko":"뉴스 리딩","youtube":""},{"id":43,"en":"Numbers & Names","ko":"숫자·고유명사","youtube":""},{"id":44,"en":"Studio Reading","ko":"마이크 리딩","youtube":""},{"id":45,"en":"Narration Reading","ko":"내레이션","youtube":""},{"id":46,"en":"Dialogue Exchange","ko":"대사 교환","youtube":""},{"id":47,"en":"Monologue Delivery","ko":"독백","youtube":""},{"id":48,"en":"Scene Objective","ko":"장면 목표","youtube":""},{"id":49,"en":"One-Minute Speech","ko":"1분 스피치","youtube":""},{"id":50,"en":"Voice Recording Review","ko":"녹음 비교 평가","youtube":""}]}];
+const VOICE_LEVELS = [{"id":1,"title":"기초","items":[{"id":1,"en":"Body Scan","ko":"신체 긴장 관찰","youtube":""},{"id":2,"en":"Head Massage","ko":"헤드 마사지","youtube":"https://youtu.be/VBk-3W0e0v4?si=QvrDQ6i6AdvnwTu4"},{"id":3,"en":"Jaw & Neck Release","ko":"턱 목 이완","youtube":""},{"id":4,"en":"Shoulder Release","ko":"어깨 이완","youtube":""},{"id":5,"en":"Scapular Release","ko":"견갑 이완","youtube":""},{"id":6,"en":"Thoracic Mobility","ko":"흉추 가동성","youtube":"https://youtu.be/9iHko2F81cE?si=SAP_8-7p_vHJwIYY"},{"id":7,"en":"Easy Onset","ko":"부드러운 발성 시작","youtube":""},{"id":8,"en":"Straw Phonation","ko":"빨대 발성","youtube":""},{"id":9,"en":"Gentle Humming","ko":"허밍","youtube":""},{"id":10,"en":"Comfortable Tone","ko":"편안한 지속 발성","youtube":""}]},{"id":2,"title":"제어","items":[{"id":11,"en":"Lip Trill","ko":"입술 트릴","youtube":""},{"id":12,"en":"Cup Bubble Phonation","ko":"물컵 발성","youtube":""},{"id":13,"en":"Pitch Glide","ko":"음높이 이동","youtube":""},{"id":14,"en":"Three-Pitch Pattern","ko":"3단 음높이","youtube":""},{"id":15,"en":"Soft-Medium Voice","ko":"음량 전환","youtube":""},{"id":16,"en":"M-N-NG Transition","ko":"비음 전환","youtube":""},{"id":17,"en":"Humming to Vowel","ko":"허밍·모음 연결","youtube":""},{"id":18,"en":"Resonant Syllables","ko":"공명 음절","youtube":""},{"id":19,"en":"Resonant Sentences","ko":"공명 문장","youtube":""},{"id":20,"en":"Voice-to-Speech","ko":"발성에서 말하기 연결","youtube":""}]},{"id":3,"title":"발음","items":[{"id":21,"en":"Vowel Precision","ko":"모음 정확도","youtube":""},{"id":22,"en":"Consonant Contrast","ko":"자음 구별","youtube":""},{"id":23,"en":"Final Consonants","ko":"받침 발음","youtube":""},{"id":24,"en":"Tongue Placement","ko":"혀의 위치","youtube":""},{"id":25,"en":"Tongue Twisters","ko":"잰말놀이","youtube":""},{"id":26,"en":"Rising-Falling Intonation","ko":"상승·하강 억양","youtube":""},{"id":27,"en":"Contrastive Stress","ko":"강세 전환","youtube":""},{"id":28,"en":"Rhythm Reading","ko":"리듬 낭독","youtube":""},{"id":29,"en":"Tempo Variation","ko":"속도 조절","youtube":""},{"id":30,"en":"Semantic Pausing","ko":"의미 단위 쉼","youtube":""}]},{"id":4,"title":"표현","items":[{"id":31,"en":"Volume Scale","ko":"음량 조절","youtube":""},{"id":32,"en":"Projection Without Shouting","ko":"소리 지르지 않는 투사","youtube":""},{"id":33,"en":"Clear Speech","ko":"명료한 말하기","youtube":""},{"id":34,"en":"Key Message Delivery","ko":"핵심 메시지 전달","youtube":""},{"id":35,"en":"Emotion Contrast","ko":"감정 변화","youtube":""},{"id":36,"en":"Emotional Restraint","ko":"절제된 감정","youtube":""},{"id":37,"en":"Action Verb Reading","ko":"행동 의도 표현","youtube":""},{"id":38,"en":"Intention Shift","ko":"의도 전환","youtube":""},{"id":39,"en":"Hidden Meaning","ko":"서브텍스트","youtube":""},{"id":40,"en":"Character Vocal Profile","ko":"캐릭터 음성","youtube":""}]},{"id":5,"title":"실전","items":[{"id":41,"en":"First-Sight Reading","ko":"초견 낭독","youtube":""},{"id":42,"en":"News Anchor Reading","ko":"뉴스 리딩","youtube":""},{"id":43,"en":"Numbers & Names","ko":"숫자·고유명사","youtube":""},{"id":44,"en":"Studio Reading","ko":"마이크 리딩","youtube":""},{"id":45,"en":"Narration Reading","ko":"내레이션","youtube":""},{"id":46,"en":"Dialogue Exchange","ko":"대사 교환","youtube":""},{"id":47,"en":"Monologue Delivery","ko":"독백","youtube":""},{"id":48,"en":"Scene Objective","ko":"장면 목표","youtube":""},{"id":49,"en":"One-Minute Speech","ko":"1분 스피치","youtube":""},{"id":50,"en":"Voice Recording Review","ko":"녹음 비교 평가","youtube":""}]}];
 function youtubeId(url) {
   if (!url) return '';
   try {
@@ -37,6 +37,7 @@ function youtubeId(url) {
 }
 const VOICE_LINKS_KEY = 'voice-flow-hub-drill-youtube-v1';
 const HEAD_MASSAGE_LINK_MIGRATION='voice-flow-hub-head-massage-link-v2';
+const VOICE_REORDER_MIGRATION='voice-flow-hub-reorder-v3';
 function readVoiceLinks() {
   try {
     const value=JSON.parse(localStorage.getItem(VOICE_LINKS_KEY)||'{}');
@@ -47,17 +48,31 @@ function readVoiceLinks() {
       localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(links));
       localStorage.setItem(HEAD_MASSAGE_LINK_MIGRATION,'done');
     }
+    if(localStorage.getItem(VOICE_REORDER_MIGRATION)!=='done') {
+      const thoracicLink=links[5];
+      delete links[3];delete links[4];delete links[5];delete links[6];
+      if(thoracicLink && youtubeId(thoracicLink)) links[6]=thoracicLink;
+      localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(links));
+      localStorage.setItem(VOICE_REORDER_MIGRATION,'done');
+    }
     return links;
   } catch { return {}; }
 }
 const VOICE_TIME_KEY='voice-flow-hub-timestamps-v1';
-const DEFAULT_VOICE_TIMES = {2:[0,65,104,190,275,345,425,493,546],5:[0]};
+const DEFAULT_VOICE_TIMES = {2:[0,65,104,190,275,345,425,493,546],6:[0]};
 function readVoiceTimes() {
   try {
     const saved=JSON.parse(localStorage.getItem(VOICE_TIME_KEY)||'{}');
-    return saved && typeof saved==='object' && !Array.isArray(saved) ? saved : {};
+    const values=saved && typeof saved==='object' && !Array.isArray(saved) ? saved : {};
+    if(localStorage.getItem('voice-flow-hub-time-reorder-v3')!=='done') {
+      if(Array.isArray(values[5])) values[6]=values[5];
+      delete values[5];
+      localStorage.setItem(VOICE_TIME_KEY,JSON.stringify(values));
+      localStorage.setItem('voice-flow-hub-time-reorder-v3','done');
+    }
+    return values;
   } catch {return {};}
-}
+
 function parseVoiceTime(value) {
   const parts=String(value||'').trim().split(':');
   if (parts.length!==2 && parts.length!==3) return null;
@@ -145,7 +160,7 @@ function VoiceTraining() {
         </form>}
         {isOpen && <div className="voice-video-content">{video ?
           <>
-            {(item.id===2 || item.id===5) && <div className="voice-time-panel">
+            {(item.id===2 || item.id===6) && <div className="voice-time-panel">
               <div className="voice-time-buttons">{(times[item.id]||DEFAULT_VOICE_TIMES[item.id]||[0]).map((seconds,index)=><button key={seconds} className={'voice-time-number'+(Number(activeStart[item.id]||0)===seconds?' active':'')} type="button" title={formatVoiceTime(seconds)+'부터 재생'} aria-label={(index+1)+'번 구간 '+formatVoiceTime(seconds)+'부터 재생'} onClick={()=>seekToDrill(item.id,seconds)}>{index+1}</button>)}</div>
             </div>}
             <div className="voice-video-wrap"><iframe key={video} ref={node=>{videoFrames.current[item.id]=node}} title={item.en+' 유튜브 영상'} src={'https://www.youtube-nocookie.com/embed/'+video+'?enablejsapi=1&playsinline=1&origin='+encodeURIComponent(window.location.origin)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"/></div>
