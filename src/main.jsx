@@ -36,10 +36,18 @@ function youtubeId(url) {
   return '';
 }
 const VOICE_LINKS_KEY = 'voice-flow-hub-drill-youtube-v1';
+const HEAD_MASSAGE_LINK_MIGRATION='voice-flow-hub-head-massage-link-v2';
 function readVoiceLinks() {
   try {
     const value=JSON.parse(localStorage.getItem(VOICE_LINKS_KEY)||'{}');
-    return value && typeof value==='object' && !Array.isArray(value) ? value : {};
+    const links=value && typeof value==='object' && !Array.isArray(value) ? value : {};
+    // One-time replacement of any previously saved drill 2 URL, preserving other drills.
+    if(localStorage.getItem(HEAD_MASSAGE_LINK_MIGRATION)!=='done') {
+      delete links[2];
+      localStorage.setItem(VOICE_LINKS_KEY,JSON.stringify(links));
+      localStorage.setItem(HEAD_MASSAGE_LINK_MIGRATION,'done');
+    }
+    return links;
   } catch { return {}; }
 }
 const VOICE_TIME_KEY='voice-flow-hub-timestamps-v1';
