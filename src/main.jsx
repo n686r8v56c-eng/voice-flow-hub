@@ -114,8 +114,8 @@ function VoiceTraining() {
 }
 
 function App() {
-  const initial = new URLSearchParams(window.location.search).get('app');
-  const [selected,setSelected] = useState(MODES.some(m=>m.id===initial)?initial:MODES[0].id);
+  // Always open the first app in MODES. Old ?app= URLs must not override hub order.
+  const [selected,setSelected] = useState(MODES[0].id);
   const [links,setLinks] = useState(readSaved);
   const [settings,setSettings] = useState(false);
   const [draft,setDraft] = useState('');
@@ -124,10 +124,13 @@ function App() {
   const current = MODES.find(m=>m.id===selected)||MODES[0];
   const activeUrl = sanitizeUrl(Object.prototype.hasOwnProperty.call(links,selected)?String(links[selected]||''):current.defaultUrl);
   useEffect(()=>{
+    // Remove legacy app selection from the address bar; switching tabs stays in this visit only.
     const params = new URLSearchParams(window.location.search);
-    params.set('app',selected);
-    window.history.replaceState(null,'',window.location.pathname+'?'+params.toString()+window.location.hash);
-  },[selected]);
+    if(!params.has('app'))return;
+    params.delete('app');
+    const qs=params.toString();
+    window.history.replaceState(null,'',window.location.pathname+(qs?'?'+qs:'')+window.location.hash);
+  },[]);
   useEffect(()=>{setDraft(activeUrl);setError('');setSettings(false)},[selected]);
   function saveUrl(e) {
     e.preventDefault();
