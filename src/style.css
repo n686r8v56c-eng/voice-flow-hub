@@ -116,3 +116,18 @@
 /* Fixed numbered timestamp buttons */
 .voice-time-number{min-width:34px;height:32px;padding:0 9px;border:1px solid #e2d6f0;border-radius:8px;background:#f4eefb;color:#71518f;font-size:14px;font-weight:650;font-variant-numeric:tabular-nums}
 .voice-time-number.active{background:#decdf2;border-color:#b99ad8;color:#4d2777}
+
+
+/* Voice Studio account access */
+.voice-auth{height:100%;overflow:auto;padding:28px 16px;background:#fbf9fe;display:flex;align-items:flex-start;justify-content:center}
+.voice-auth-card{width:min(100%,370px);display:flex;flex-direction:column;gap:11px;background:#fff;padding:22px 18px;border:1px solid #e8def1;border-radius:14px}
+.voice-auth-card h2{font-size:20px;margin:0}
+.voice-auth-card p{margin:0;color:#81738f;font-size:14px;line-height:1.55}
+.voice-auth-card input{width:100%;height:43px;min-width:0;padding:9px 12px;border:1px solid #d9cce7;border-radius:9px;font-size:16px}
+.voice-auth-modes{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.voice-auth-modes button{padding:10px;border-radius:9px;background:#f6f1fa;color:#80718f;font-size:14px}
+.voice-auth-modes button.selected{background:#eadcf7;color:#65418e;font-weight:700}
+.voice-auth-card .primary{min-height:42px;font-size:15px}
+.voice-auth-loading{height:100%;display:flex;align-items:center;justify-content:center;color:#81738f;font-size:15px;padding:25px;text-align:center}
+.voice-logout{border-radius:8px;padding:7px 10px;background:#f3ebfa;color:#74539a;font-size:13px;font-weight:600;white-space:nowrap}
+.voice-sync-alert{border:1px solid #dfc5df;border-radius:9px;color:#903f71;padding:10px;font-size:13px;line-height:1.5}
